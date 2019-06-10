@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <link rel="stylesheet" href="<%= BASE_URL %>css/min.css">
+    <title>ft-creater</title>
+  </head>
+  <body class="bg-secondary">
+    <noscript>
+      <strong>We're sorry but ft-creater doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div class="loader-box">
+      <div class="lds-ripple">
+        <div></div><div></div>
+      </div>
+      <h1 id="loader-title" class="text-center text-info"></h1>
+    </div>
+    
+
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+
+    <script>
+      window.code = `scilla_version 0\n\n(* This contract implements a fungible token interface a la ERC20.*)\n\n(***************************************************)\n(*               Associated library                *)\n(***************************************************)\nlibrary FungibleToken\n\nlet min_int =\n  fun (a : Uint128) => fun (b : Uint128) =>\n  let alt = builtin lt a b in\n  match alt with\n  | True =>\n    a\n  | False =>\n    b\n  end\n\nlet le_int =\n  fun (a : Uint128) => fun (b : Uint128) =>\n    let x = builtin lt a b in\n    match x with\n    | True => True\n    | False =>\n      let y = builtin eq a b in\n      match y with\n      | True => True\n      | False => False\n      end\n    end\n    \n\n(***************************************************)\n(*             The contract definition             *)\n(***************************************************)\n\ncontract FungibleToken\n(owner : ByStr20,\n total_tokens : Uint128,\n decimals : Uint32,\n name : String,\n symbol : String)\n\n(* Initial balance is not stated explicitly: it's initialized when creating the contract. *)\n\nfield balances : Map ByStr20 Uint128 =\n  let m = Emp ByStr20 Uint128 in\n    builtin put m owner total_tokens\nfield allowed : Map ByStr20 (Map ByStr20 Uint128) = Emp ByStr20 (Map ByStr20 Uint128)\n\ntransition BalanceOf (tokenOwner : ByStr20)\n  bal <- balances[tokenOwner];\n  match bal with\n  | Some v =>\n\te = {_eventname : \"BalanceOf\"; address : tokenOwner; balance : v};\n\tevent e\n  | None =>\n\te = {_eventname : \"BalanceOf\"; address : tokenOwner; balance : Uint128 0};\n    event e\n  end\nend\n\ntransition TotalSupply ()\n  e = {_eventname : \"TotalSupply\"; caller : _sender; balance : total_tokens};\n  event e\nend\n\ntransition Transfer (to : ByStr20, tokens : Uint128)\n  bal <- balances[_sender];\n  match bal with\n  | Some b =>\n    can_do = le_int tokens b;\n    match can_do with\n    | True =>\n      (* subtract tokens from _sender and add it to \"to\" *)\n      new_sender_bal = builtin sub b tokens;\n      balances[_sender] := new_sender_bal;\n\n      (* Adds tokens to \"to\" address *)\n      to_bal <- balances[to];\n      new_to_bal = match to_bal with\n      | Some x => builtin add x tokens\n      | None => tokens\n      end;\n\n  \t  balances[to] := new_to_bal;\n      e = {_eventname : \"TransferSuccess\"; sender : _sender; recipient : to; amount : tokens};\n      event e\n    | False =>\n      (* balance not sufficient. *)\n      e = {_eventname : \"TransferFailure\"; sender : _sender; recipient : to; amount : Uint128 0};\n      event e\n    end\n  | None =>\n    (* no balance record, can't transfer *)\n  \te = {_eventname : \"TransferFailure\"; sender : _sender; recipient : to; amount : Uint128 0};\n    event e\n  end\nend\n\ntransition TransferFrom (from : ByStr20, to : ByStr20, tokens : Uint128)\n  bal <- balances[from];\n  (* Check if _sender has been authorized by \"from\" *)\n  sender_allowed_from <- allowed[from][_sender];\n  match bal with\n  | Some a =>\n    match sender_allowed_from with\n    | Some b =>\n        (* We can only transfer the minimum of available or authorized tokens *)\n        t = min_int a b;\n        can_do = le_int tokens t;\n        match can_do with\n        | True =>\n            (* tokens is what we should subtract from \"from\" and add to \"to\" *)\n            new_from_bal = builtin sub a tokens;\n            balances[from] := new_from_bal;\n            to_bal <- balances[to];\n            match to_bal with\n            | Some tb =>\n                new_to_bal = builtin add tb tokens;\n                balances[to] := new_to_bal\n            | None =>\n                (* \"to\" has no balance. So just set it to tokens *)\n                balances[to] := tokens\n            end;\n            (* reduce \"allowed\" by \"tokens\" *)\n            new_allowed = builtin sub b tokens;\n            allowed[from][_sender] := new_allowed;\n            e = {_eventname : \"TransferFromSuccess\"; sender : from; recipient : to; amount : tokens};\n            event e\n        | False =>\n            e = {_eventname : \"TransferFromFailure\"; sender : from; recipient : to; amount : Uint128 0};\n            event e\n        end\n    | None =>\n        e = {_eventname : \"TransferFromFailure\"; sender : from; recipient : to; amount : Uint128 0};\n        event e\n    end\n  | None =>\n\te = {_eventname : \"TransferFromFailure\"; sender : from; recipient : to; amount : Uint128 0};\n\tevent e\n  end\nend\n\ntransition Approve (spender : ByStr20, tokens : Uint128)\n  allowed[_sender][spender] := tokens;\n  e = {_eventname : \"ApproveSuccess\"; approver : _sender; spender : spender; amount : tokens};\n  event e\nend\n\ntransition Allowance (tokenOwner : ByStr20, spender : ByStr20)\n  spender_allowance <- allowed[tokenOwner][spender];\n  match spender_allowance with\n  | Some n =>\n      e = {_eventname : \"Allowance\"; owner : tokenOwner; spender : spender; amount : n};\n      event e\n  | None =>\n      e = {_eventname : \"Allowance\"; owner : tokenOwner; spender : spender; amount : Uint128 0};\n      event e\n  end\nend\n`;
+    </script>
+  </body>
+</html>
