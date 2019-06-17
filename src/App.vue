@@ -59,9 +59,9 @@ export default {
     'connect-form': ConnectForm
   },
   mounted() {
-    window.addEventListener("load", () => {
+    window.addEventListener("load", async () => {
       this.endLoading();
-      const test = this.zilpayTest();
+      const test = await this.zilpayTest();
 
       if (test === this.code.notZilPay) {
         this.$refs[this.code.notZilPay].show();

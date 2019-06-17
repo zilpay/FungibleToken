@@ -140,13 +140,11 @@ export default {
           this.form.name,
           this.form.symbol
         );
+        await this.txObservable(this.contract.id);
+        this.$refs[this.isDeploy].show();
       } catch(err) {
         this.errorMsg = err.message || err;
       }
-
-      await this.txObservable(this.contract.id);
-
-      this.$refs[this.isDeploy].show();
 
       this.endLoading();
     }
