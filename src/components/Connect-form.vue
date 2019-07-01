@@ -219,7 +219,7 @@ export default {
       this.endLoading();
     },
     toBech32Address(address) {
-      const zilliqa = new window.Zilliqa();
+      const zilliqa = window.zilPay;
       const { toBech32Address } = zilliqa.crypto;
       return toBech32Address(address);
     },

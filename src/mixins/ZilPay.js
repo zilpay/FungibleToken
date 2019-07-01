@@ -10,7 +10,7 @@ export default {
   },
   methods: {
     validateAddreas(address) {
-      const zilliqa = new window.Zilliqa();
+      const zilliqa = window.zilPay;
       const { validation } = zilliqa.utils;
       const {
         decodeBase58,
@@ -28,20 +28,19 @@ export default {
       }
       return toChecksumAddress(address);
     },
-    async zilpayTest() {
+    zilpayTest() {
       if (typeof window.zilPay === 'undefined') {
         return this.code.notZilPay;
-      } else if (!window.zilPay.isEnable) {
+      } else if (!window.zilPay.wallet.isEnable) {
         return this.code.notEnable;
-      } else if (!window.zilPay.isConnect) {
-        await window.zilPay.connect();
+      } else if (!window.zilPay.wallet.isConnect) {
         return this.code.notConnect;
       }
       
       return true;
     },
     async deployFungibleToken(owner, totalTokens, decimals, name, symbol) {
-      const zilliqa = new window.Zilliqa();
+      const zilliqa = window.zilPay;
       const { units, Long } = zilliqa.utils;
       const { toBech32Address } = zilliqa.crypto;
       const code = window.code;
@@ -96,7 +95,7 @@ export default {
     },
     async txObservable(id) {
       return new Promise(resolve => {
-        const zilliqa = new window.Zilliqa();
+        const zilliqa = window.zilPay;
 
         const obs = setInterval(() => {
           zilliqa.blockchain
@@ -110,7 +109,7 @@ export default {
       });
     },
     async contractInfo(address) {
-      const zilliqa = new window.Zilliqa();
+      const zilliqa = window.zilPay;
       
       address = this.validateAddreas(address);
       address = address.replace('0x', '');
@@ -128,7 +127,7 @@ export default {
       };
     },
     async TransferFrom(address, payload) {
-      const zilliqa = new window.Zilliqa();
+      const zilliqa = window.zilPay;
       const { units, BN, Long } = zilliqa.utils;
       const contract = zilliqa.contracts.at(address);
       const gasPrice = units.toQa('1000', units.Units.Li);
@@ -161,7 +160,7 @@ export default {
       return tx.TranID;
     },
     async Transfer(address, payload) {
-      const zilliqa = new window.Zilliqa();
+      const zilliqa = window.zilPay;
       const { units, BN, Long } = zilliqa.utils;
       const contract = zilliqa.contracts.at(address);
       const gasPrice = units.toQa('1000', units.Units.Li);
@@ -189,7 +188,7 @@ export default {
       return tx.TranID;
     },
     async Approve(address, payload) {
-      const zilliqa = new window.Zilliqa();
+      const zilliqa = window.zilPay;
       const { units, BN, Long } = zilliqa.utils;
       const contract = zilliqa.contracts.at(address);
       const gasPrice = units.toQa('1000', units.Units.Li);
@@ -217,7 +216,7 @@ export default {
       return tx.TranID;
     },
     async Allowance(address, payload) {
-      const zilliqa = new window.Zilliqa();
+      const zilliqa = window.zilPay;
       const { units, BN, Long } = zilliqa.utils;
       const contract = zilliqa.contracts.at(address);
       const gasPrice = units.toQa('1000', units.Units.Li);

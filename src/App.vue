@@ -68,10 +68,12 @@ export default {
       } else if (test === this.code.notEnable) {
         this.$refs[this.code.notEnable].show();
       } else if (test === this.code.notConnect) {
-        window.zilPay.connect().then(
-          () => this.ownerAddress = window.zilPay.defaultAccount.bech32 
-        );
+        await window.zilPay.wallet.connect();
       }
+
+      window.zilPay.wallet.observableAccount(account => {
+        this.ownerAddress = account.bech32;
+      });
     });
   }
 }
