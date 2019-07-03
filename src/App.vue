@@ -70,10 +70,6 @@ export default {
       } else if (test === this.code.notConnect) {
         await window.zilPay.wallet.connect();
       }
-
-      window.zilPay.wallet.observableAccount(account => {
-        this.ownerAddress = account.bech32;
-      });
     });
   }
 }

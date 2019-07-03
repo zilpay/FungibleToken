@@ -147,17 +147,21 @@ export default {
       }
 
       this.endLoading();
+    },
+    observableAccount() {
+      setTimeout(() => {
+        this.form.owner = window.zilPay.wallet.defaultAccount.bech32;
+        window.zilPay.wallet.observableAccount().subscribe(account => {
+          this.form.owner = account.bech32;
+        });
+      }, 1000);
     }
   },
-  created() {
+  mounted() {
     try {
-      window.zilPay.observableAccount().subscribe(() => {
-        if (window.zilPay.defaultAccount) {
-          this.form.owner =  window.zilPay.defaultAccount.bech32
-        }
-      });
+      this.observableAccount();
     } catch(err) {
-      // eslint-disable-next-line
+      /* eslint-disable */
     }
   }
 }
