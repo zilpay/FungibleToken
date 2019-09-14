@@ -26,7 +26,7 @@
         <br>
         Total supply: <span class="text-secondary">{{init[2].value}}</span>
         <br>
-        Balance: <span class="text-secondary">{{state.balance.value}} ZIL</span>
+        Balance: <span class="text-secondary">{{state.balance}} ZIL</span>
         <br>
         Decimals: <span class="text-secondary">{{init[3].value}}</span>
         <br>
@@ -207,7 +207,7 @@ export default {
 
         this.init = contractInfo.init;
         this.state = {
-          balance: contractInfo.state.filter(el => el.vname == '_balance')[0]
+          balance: contractInfo.state['_balance']
         };
         this.isEnable = true;
       } catch(err) {
